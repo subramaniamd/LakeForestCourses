@@ -1,0 +1,138 @@
+---
+title: "Exploratory Data Analysis"
+author: "Dipika Subramaniam"
+output: 
+   pdf_document:
+      toc: yes
+---
+
+
+
+# Paper Requirements:
+Submit at least 4 graphical displays according to the standards used in class. Include both one- and two-variable plots. For each, write a sentence or two describing the conclusions suggested by the plots. 
+In your paper, you'll need to interrogate these conclusions more carefully. The purpose here is just preliminary analysis. 
+
+
+# Getting Started
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(stats)
+library(tidyverse)
+library(moderndive)
+library(dplyr)
+library(infer)
+library(knitr)
+library(skimr)
+library(ISLR)
+library(readr)
+
+#red_data <- winequality.red
+#white_data <- winequality.white
+red_data <- read_delim("winequality-red.csv", ";", escape_double = FALSE)
+white_data <- read_delim("winequality-white.csv", ";", escape_double = FALSE)
+
+names(red_data)<-str_replace_all(names(red_data), c(" " = "." , "," = "" ))
+names(white_data)<-str_replace_all(names(white_data), c(" " = "." , "," = "" ))
+
+white_data2 <- white_data %>% 
+  mutate(color = "white")
+red_data2 <- red_data %>%
+  mutate(color = "red")
+total_data <- rbind(white_data2, red_data2) 
+
+```
+
+The `white_data` contains sample data for 4898 white wines from some unknown population.
+The `red_data` contains sample data for 1599 red wines from some unknown population. 
+The variables are summarized below, as given by the winequality.names file and [Cortez et al., 2009].
+This paper was made in R Markdown.
+
+```
+   Input variables (based on physicochemical tests):
+   1 - fixed acidity
+   2 - volatile acidity
+   3 - citric acid
+   4 - residual sugar
+   5 - chlorides
+   6 - free sulfur dioxide
+   7 - total sulfur dioxide
+   8 - density
+   9 - pH
+   10 - sulphates
+   11 - alcohol
+   Output variable (based on sensory data): 
+   12 - quality (score between 0 and 10)
+```
+
+#  Distributions of Chlorides in red and white
+
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(red_data, aes(x = chlorides)) +
+  geom_histogram(binwidth = .01, color = "black", fill = "darkred") + ggtitle("Histogram of Red wine Chlorides")
+ggplot(white_data, aes(x = chlorides)) +
+  geom_histogram(binwidth = .01, color = "white", fill = "wheat2") + ggtitle("Histogram of White wine Chlorides")
+```
+```
+From the previous histograms, we can visually approximate the chlorides to have a normal
+distribution in both red and white. 
+We can use this observation in the paper, we can calculate confidence intervals and do
+some hypothesis testing to see if the means are equal. There are many different tests 
+and exercises that we could try out here.
+Off the top of my head, it seems as though they both have right skews, and I wonder if 
+I need to remove outliers of chlorides >0.2 for red and >0.1 for white. Visually we can 
+see that white has a mean of 0.04, and red has a mean of 0.08.
+```
+#  Quality comparison between Red and White
+Here, we have merged two datasets into one, called total_data, where the red and white are distinguished by a variable named "color".
+  
+  
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(total_data, aes(x = fixed.acidity, y = volatile.acidity, color = color)) + geom_point()  + labs(x = "fixed acidity", y = "volatile acidity", title = "Fixed vs volatile acidity of Wine", color = "Color")  +  geom_smooth(method = "lm", se = FALSE) + scale_color_manual(values = c("darkred", "wheat3"))
+```
+
+
+
+
+```
+I'm not yet sure of the relationship between fixed and volatile acidity related
+to color of wine, but I'm including it in this data analysis because I want to
+investigate why the red is more spread than the white.
+```
+
+
+
+
+#  Correlation between Residual Sugars and Density in Red
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(red_data, aes(x = residual.sugar, y = density)) +
+  geom_point(color = "darkred") +
+  labs(x = "Residual Sugar", 
+       y = "Density",
+       title = "Scatterplot of relationship of Residual Sugars and Density") 
+red_data %>% 
+  get_correlation(formula = residual.sugar ~ density)
+```
+   
+```
+Here we have made a graph of residual sugars vs density. The correlation is 0.355.
+As you can see, there are a few values with residual sugars > 4, but the majority
+is a blob that lies under that value.
+If we remove a few outliers, we could get a clear view and possibly a stronger 
+correlation between residual sugars and density.
+```
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+red_datafiltered <- red_data %>% filter(residual.sugar < 4)
+ggplot(red_datafiltered, aes(x = residual.sugar, y = density)) +
+  geom_point(color = "darkred") +
+  labs(x = "Residual Sugar", 
+       y = "Density",
+       title = "Scatterplot of relationship of Residual Sugars and Density")
+red_datafiltered %>% 
+  get_correlation(formula = residual.sugar ~ density)
+```
+```
+We found a slightly stronger correlation of 0.395, which is still a weak correlation.
+Even though its weak, this data could be useful for the paper.
+```

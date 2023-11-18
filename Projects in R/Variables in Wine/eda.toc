@@ -1,0 +1,5 @@
+\contentsline {section}{Paper Requirements:}{1}{section*.2}%
+\contentsline {section}{Getting Started}{1}{section*.3}%
+\contentsline {section}{Distributions of Chlorides in red and white}{2}{section*.4}%
+\contentsline {section}{Quality comparison between Red and White}{3}{section*.5}%
+\contentsline {section}{Correlation between Residual Sugars and Density in Red}{4}{section*.6}%

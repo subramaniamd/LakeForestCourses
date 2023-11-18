@@ -1,0 +1,19 @@
+\contentsline {section}{Abstract}{2}{section*.2}%
+\contentsline {section}{Introduction}{2}{section*.3}%
+\contentsline {subsection}{Formatting of this paper, and literature}{2}{section*.4}%
+\contentsline {subsection}{A little bit about the datasets.}{3}{section*.5}%
+\contentsline {subsection}{Focus of the project}{3}{section*.6}%
+\contentsline {section}{Volatile Acidity}{4}{section*.7}%
+\contentsline {subsection}{Wine Spoilage}{4}{section*.8}%
+\contentsline {subsection}{Aroma Threshold}{6}{section*.9}%
+\contentsline {subsection}{Low or High VA}{7}{section*.10}%
+\contentsline {subsection}{Quality}{7}{section*.11}%
+\contentsline {section}{Chlorides}{8}{section*.12}%
+\contentsline {subsection}{Qqplots to check for normality:}{9}{section*.13}%
+\contentsline {subsection}{Qqplot comparing red and white:}{10}{section*.14}%
+\contentsline {subsection}{Two-sided, unpaired sample t-test:}{10}{section*.15}%
+\contentsline {section}{Quality}{11}{section*.16}%
+\contentsline {section}{An Important Failed Inference}{13}{section*.17}%
+\contentsline {subsection}{Residual Sugar and Alcohol}{13}{section*.18}%
+\contentsline {section}{Conclusion}{14}{section*.19}%
+\contentsline {section}{Bibliography}{15}{section*.20}%
