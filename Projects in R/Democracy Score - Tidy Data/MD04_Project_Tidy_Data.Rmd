@@ -1,0 +1,134 @@
+
+---
+title: 'MD Chapter 04 Project: Tidy Data'
+author: 'Dipika'
+output:
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+# Getting Started
+
+In this project we will practice the key concepts presented in Modern Dive Chapter 4 for putting data into Tidy format.
+
+First, make sure you execute the code chunk below to load the necessary packages and data. 
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+# Necessary Packages
+library(tidyverse)
+library(readr)
+library(fivethirtyeight)  # Contains mueller_approval_polls data frame
+
+?mueller_approval_polls
+
+# View it, glimpse() it, or whatever your preferred way is for wrapping your brain around this data set.
+
+# Note: No political agenda here -- was looking through the fivethirtyeight data sets, and this was the first one I found 
+# that was perfect for what I want to emphasize in this assignment: The need to Tidy data +  more practice on Data Visualization
+```
+
+***
+
+# Answering The Exercises
+
+Supply your answers as shown in the code chunks below.
+
+```{r, message = FALSE, warning = FALSE}
+# Supply code anwsers like this
+```
+
+```
+Supply any written anwsers in a generic code chunk like this.
+```
+
+***
+
+# Exercises
+
+## Exercise 1
+This short exercise has nothing to do with the mueller_approval_polls data set that will be used for the rest of this worksheet.  Rather, this short exercise emphasizes a subtle point from the case study on the Democracy Score data in section 4.3 of the Modern Dive book.  The book's code that filters the data for only Guatemala, Tidies it, and then generate a linegraph is provided below.  Remove the `names_ptypes` parameter (careful with the syntax) and then run the code again.  Notice that the linegraph now doesn't plot.  Answer the following questions with text only.  
+
+### A) What difference does removing `names_ptypes` parameter make in the `guat_dem_tidy` table?
+```
+The plot disappears.
+```
+### B) Why does that difference cause the linegraph to not work?
+```
+The x-axis data is still a string, not a continuous variable, so it doesn't recognize it as plottable.
+
+```{r, message = FALSE, warning = FALSE}
+
+dem_score <- read_csv("dem_score.csv")
+
+guat_dem_tidy <- dem_score %>% 
+  filter(country == "Guatemala") %>% 
+  pivot_longer(names_to = "year", 
+               values_to = "democracy_score", 
+               cols = -country,
+               names_ptypes = list(year = integer()))   # Remove this line
+
+guat_dem_tidy  # To get a tibble view, just use the name of the data frame
+
+ggplot(guat_dem_tidy, aes(x = year, y = democracy_score)) +
+  geom_line() +
+  labs(x = "Year", y = "Democracy Score")
+
+```
+
+
+## Exercise 2
+There is a graphic named `facet_wrapped_barplots.png` included with this project.  The goal of this exercise is to create this plot from the `mueller_approval_polls` data set. Simply click on the graphic to see it. 
+
+The plots ONLY contain data from polls that **ended** on or after 2019-04-19 (ignore the poll start dates), and ONLY for the 4 pollsters shown in the data.
+
+Directions:
+
+- Filter the data for only the polls you want. (Do not overwrite the mueller_approval_polls data set. Create a new table.)
+- Tidy (pivot) the data to create new columns named `poll_responses` whose values are approve, disapprove, unsure, and `percentages` with the corresponding numeric values.
+- Create the barplot shown in the graphic (facet_wrap() on the pollster variable). 
+```{r, message = FALSE, warning = FALSE}
+View(mueller_approval_polls)
+
+exercise2 <- mueller_approval_polls %>%
+  filter(end == "2019-04-19" | end == "2019-04-23" | end == "2019-04-28" | end == "2019-04-29") %>%
+  pivot_longer(names_to = "poll_responses", 
+               values_to = "percentages", 
+               cols = approve:unsure)
+View(exercise2)
+
+ggplot(exercise2, aes(x = poll_responses, y = percentages)) +
+  geom_col() +
+  labs(x = "Poll Responses", y = "Percentages") + 
+  facet_wrap(~ pollster)
+
+```
+## Exercise 3
+There is a graphic named `double_linegraphs_better.png` included with this project.  The goal of this exercise is to create this plot from the `mueller_approval_polls` data set. 
+The plots contain all polls in the data frame that were conducted by the `YouGov/Economist` polling group.
+
+Directions:
+
+- Filter the data for only the polls you want. Also rename the `end` variable to `poll_date` to match the x-axis in the `double_linegraphs_better.png` plot.   (Do not overwrite the mueller_approval_polls data set. Create a new table.)
+- You can create a double line graph like `double_linegraphs.png` (check it out) without Tidying the data.  However, you need to Tidy (pivot) the data to create the categorical variable for party affiliation you see on the right side of `double_linegraphs_better.png`.  
+- The Modern Dive book hasn't yet shown how to create double line graphs. I built both double linegraph examples I have shown you using [techniques in these examples](https://www.datanovia.com/en/blog/how-to-create-a-ggplot-with-multiple-lines/).  I'm sure other similar examples can be found. Note: The final example on that web page uses the `gather()` function instead of the newer `pivot_longer()` as discussed in one of the "Required Reading" examples for this lesson I provided on the course Web page.
+
+Extra: There are 26 different `YouGov/Economist` polls. Can you figure out how to re=scale the x-axis so that more (not necessarily all) of the polling dates show up?
+
+```{r, message = FALSE, warning = FALSE}
+
+exercise3 <- mueller_approval_polls %>%
+  filter(pollster == "YouGov/Economist") %>%
+  rename(poll_date = end) %>%
+  pivot_longer(cols = approve_republican:approve_democrat, 
+               names_to = "response_by_party", 
+               values_to = "percentages")
+View(exercise3)
+
+ggplot(exercise3, aes(x = poll_date, y = percentages)) + 
+  geom_line(aes(color = response_by_party)) + 
+  scale_color_manual(values = c("steelblue","darkred")) +
+  labs(x= "poll_date", y = "approval_percentage")
+```
+
+
