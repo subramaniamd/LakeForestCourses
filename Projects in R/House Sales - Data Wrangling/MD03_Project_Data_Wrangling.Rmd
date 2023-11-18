@@ -1,0 +1,178 @@
+
+---
+title: 'MD Chapter 03 Project: Data Wrangling'
+author: 'Dipika Subramaniam'
+output:
+  html_document:
+    theme: lumen
+    toc: yes
+---
+
+In this project we will practice the key data manipulation tasks for describing, summarizing, and working with data. 
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+# Necessary Packages
+library(ggplot2)
+library(dplyr)
+```
+
+***
+
+# Project Data
+
+The first part of this project deals with the `txhousing` data frame about house sales in Texas.  This data comes with the `ggplot2` package, so loading that package makes the data available. 
+
+Each row is monthly data for a given city in Texas in a given year. There are multiple years of data for each city. To wrap your brain around the nature of the data, you should run the following R commands in the RStudio Console.  
+
+```
+?txhousing
+glimpse(txhousing)
+View(txhousing)       # same info as above, but you can sort the columns
+```
+
+***
+
+# Answers to Exercises
+
+```{r, message = FALSE, warning = FALSE}
+# Supply code anwsers like this
+```
+
+```
+# Supply any written anwsers like this.
+```
+
+***
+
+# Data Wrangling Basics
+
+Below each exercise, show the code **AND** a `glimpse()` of the resulting table. 
+
+## Exercise 1
+Create a data frame named `txhousing_brief` that has the `inventory` variable removed.  
+
+```{r, message = FALSE, warning = FALSE}
+txhousing_brief <- txhousing %>% select(-inventory)
+glimpse(txhousing_brief)
+```
+
+
+
+
+
+## Exercise 2
+Make a data frame called `dallas_12_13` that includes data only from the city of Dallas in 2012 & 2013. 
+```{r, message = FALSE, warning = FALSE}
+dallas_12_13 <- txhousing %>%
+  filter(city == "Dallas", year %in% c("2012","2013"))
+glimpse(dallas_12_13)
+```
+
+## Exercise 3
+Add a column to the `dallas_12_13` table called `percent_sold` that calculates the percentage of listings that were sold (`sales/listings * 100`). Be sure to **save** the results into the same `dallas_12_13` table. 
+```{r, message = FALSE, warning = FALSE}
+dallas_12_13 <- dallas_12_13%>% 
+  mutate(percent_sold = sales/listings * 100)
+glimpse(dallas_12_13)
+```
+## Exercise 4
+Create a new data frame called `dallas_grouped_avg` that calculates the **average** percentage of listings that were sold in Dallas **in each month of the year** based on your `dallas_12_13` data set. 
+```{r, message = FALSE, warning = FALSE}
+dallas_grouped_avg<- dallas_12_13%>% 
+  group_by(month) %>% 
+  summarize(mean = mean(percent_sold, na.rm = TRUE))
+glimpse(dallas_grouped_avg)
+```
+
+## Exercise 5
+Arrange the `dallas_grouped_avg` table in `desc`ending order based on the average percentage of listings that were sold in Dallas in 2012 and 2013. You do not need to save the results in a new table, just provide a `glimpse()` of the sorted table. 
+```{r, message = FALSE, warning = FALSE}
+dallas_grouped_avg %>% 
+  arrange(desc(mean, na.rm = TRUE)) 
+
+```  
+
+***
+
+# More Advanced Wrangling
+
+Below each exercise, show the code you created to answer the exercise **AND** some text for your answer. 
+
+You may have to use multiple `dplyr` functions to answer each Exercise. Think through the steps of how to get to the answer you are trying to find.  Often, the sooner you start writing code, the longer it will take you. 
+
+
+## Exercise 6
+In January of 2015, what city had the fewest houses listed for sale?
+```{r, message = FALSE, warning = FALSE}
+txhousing_brief_city <- txhousing_brief %>%
+    filter(month == "1", year == "2015")
+txhousing_brief_city
+
+txhousing_brief_city %>%
+  arrange((sales)) 
+  
+```
+```
+# San Marcos
+```
+## Exercise 7
+In 2012, in which month were the most houses sold in Texas? (show code and text please)
+```{r, message = FALSE, warning = FALSE}
+txhousing_brief_12 <- txhousing_brief %>%
+  filter(year =="2012")
+glimpse(txhousing_brief_12)
+txhousing_brief_12 %>%
+  group_by(month) %>% 
+  summarize(mean = mean(sales))
+txhousing_brief_12
+ 
+```
+```
+
+```
+
+
+## Exercise 8
+Generate generate a barplot to graphically show the number of total house sales in all of Texas for each year in the data set.  Depending upon how you tackle this problem, the choice of `geom_bar()` vs `geom_col()` will be the appropriate choice for the plot. Briefly explain your choice. 
+```{r, message = FALSE, warning = FALSE}
+
+ggplot(data = txhousing_brief, mapping = aes(x = year, y = sales)) +
+  geom_col()
+
+```
+```
+#Chose col because then we can specify y variable.
+```
+***
+
+# Wrangling Tables 
+
+Again, these exercises require a number of steps, so think through the necessary steps, perhaps on scratch paper, and set out a "blueprint" for tackling the problem before writing the code.
+
+## Exercise 9
+According to the 2010 census the top 4 most populous cities in Texas were: Houston (2,100,263), San Antonio (1,327,407), Austin (1,197,816), and Dallas (790,390). Generate a single table named `sales_2010` that shows the total number of houses sold in each of these cities in 2010. The resulting table should only have two variables, `city` and `total_sales` and the values should only reflect the 4 cities. Recall the `sum()` function can add values.  Conclude by providing a glimpse() of the resulting table as output.
+```{r, message = FALSE, warning = FALSE}
+
+sales_2010_allcity <- txhousing_brief %>%
+  filter(year == "2010")
+sales_2010_allcity
+sales_2010 <- sales_2010_allcity
+  group_by(city)
+  total_sales = sales
+  select(city,))
+glimpse(sales_2010)
+
+```
+
+## Exercise 10
+The below chunk of code creates (using two vectors) a new data table with the populations of the cities.  Join the `populations` table with the `sales_2010` table you created above, to create a new table named `sales_and_populations_2010` that has 3 variables `city` and `total_sales` and `population`.  Conclude by providing a glimpse() of the resulting table as output, and generating a scatterplot with `population` on the x-axis and `total_sales` on the y-axis.  Does there appear to be correlation? Is there a statistical principle that cautions you from drawing a broader conclusion about a correlation between population and house sales in general for all major cities in Texas?
+
+```{r}
+populations <- tibble(
+  city = c("Houston" , "San Antonio" , "Austin" , "Dallas"), 
+  population = c(2100263 , 1327407 , 1197816 , 790390)
+)
+glimpse(populations)
+```
+
+
