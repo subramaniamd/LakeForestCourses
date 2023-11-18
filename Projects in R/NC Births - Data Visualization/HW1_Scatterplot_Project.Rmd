@@ -1,0 +1,44 @@
+---
+title: "HW1_Scatterplot"
+author: Dipika Subramaniam
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+  
+---
+
+
+# Homework 1 Scatterplot Project
+
+### Jitter Plot
+```{r, warnings = FALSE, message = FALSE}
+library(ggplot2)
+library(nycflights13)
+library(dplyr)
+library(knitr)
+library(tidyverse)
+alaska_flights <- flights %>% 
+  filter(carrier == "AS")
+```
+ 
+
+```{r, warning = FALSE}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_jitter(width = 30, height = 30)
+```
+
+### Alpha Plot
+```{r, warning = FALSE}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_point(alpha = 0.2)
+```
+
+### Normal Plot
+```{r, echo = FALSE, warning = FALSE}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_point()
+```
+
+
+
